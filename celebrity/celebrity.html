@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>伟人编年史</title>
+  <link rel="shortcut icon" href="../src/map.ico" />
+  <link rel="stylesheet" href="../lib/Cesium/Widgets/widgets.css">
+  <link rel="stylesheet" href="../lib/layui-v2.5.5/layui/css/layui.css">
+  <link rel="stylesheet" href="./celebrity.css">
+  <script src="../lib/Cesium/Cesium.js"></script>
+  <script src="../lib/layui-v2.5.5/layui/layui.js"></script>
+  <script src="../lib/jquery-1.12.4-min.js"></script>
+</head>
+<body>
+  <div id="infopane" class="infobox no-see" style="z-index: 9">
+    <p id="name" class='name'></p>
+    <button id='closeBtn' class='layui-btn close-btn' type='button'><i class='layui-icon' style="position: relative; top: -10px;">&#x1006;</i></button>
+    <img id="portrait" class='portrait' />
+
+    <div>
+      <table  id='masterTable' class='layui-table no-see'>
+        <colgroup>
+          <col>
+          <col>
+          <col>
+        </colgroup>
+        <thead>
+          <tr style="background-color: transparent; color: bisque;">
+            <th>著作</th>
+            <th>时间</th>
+            <th>标签</th>
+          </tr>
+        </thead>
+        <tbody id='masterBody'>
+        </tbody>
+      </table>
+    </div>
+
+    <div style='padding: 15px; color: bisque'>
+      <p id='baseinfo'></p>
+        <a id='moreInfo'><i>更多信息...</i></a>
+    </div>
+
+    <div>
+      <button id='trace' class='layui-btn layui-btn-radius' type='button' style='margin: 0 79px'>人生轨迹</button>
+    </div>
+  </div>
+
+  <img id="leftCloud" src="../src/左云.png" class="left-cloud-out" />
+  <img id="rightCloud" src="../src/右云.png" class="right-cloud-out"/>
+  <div id="cesiumContainer" class="cesiumContainer" style="height: 100%"></div>
+
+  <ul id="leftbar" class="layui-nav layui-nav-tree layui-nav-side layui-inline" style="margin-right: 10px; width: 310px; animation: bounceToLeft 2s;" lay-filter="demo">
+    <li class="layui-nav-item">
+      <img id="itry" src="../src/logo.png" style="width: 80px; height: 70px; padding: 5px;">
+      <span id="itry" style="font-family: 'chinaStyle'; color: aqua; font-size: 36px; vertical-align: middle;">伟人编年史</span>
+    </li>
+    <li class="layui-nav-item">
+      <a href="javascript:;">&nbsp;&nbsp;&nbsp;查询&nbsp;
+        <i class="layui-icon layui-icon-search" style="font-size: 20px;"></i>
+      </a>
+      <dl class="layui-nav-child">
+        <div class="layui-anim layui-anim-scale">
+          <form class="layui-form">
+            <input type="text" name="findit" lay-verify="required" placeholder="请输入查询关键词" autocomplete="off" class="layui-input" style="margin: 15px; height: 30px; width: 180px; display: inline; border-radius: 12px">
+            <button id="findit" class="layui-btn" lay-submit lay-filter="formDemo" style="border-radius: 12px; width: 75px; height: 30px; line-height: 30px;">查询</button>
+          </form>
+        </div>
+      </dl>
+    </li>
+
+    <li class="layui-nav-item">
+      <a href="javascript:;">&nbsp;&nbsp;&nbsp;显示&nbsp;
+        <i class="layui-icon layui-icon-radio" style="font-size: 20px;"></i>
+      </a>
+      <dl class="layui-nav-child">
+        <div class="layui-anim layui-anim-scale">
+          <form class="layui-form">
+            <dd><a href="javascript:;">&nbsp;&nbsp;&nbsp;显示人名
+              <input type="checkbox" name="peopleName" lay-filter="peopleName" lay-skin="switch" lay-text="显示|隐藏" checked>
+            </a></dd>
+            <dd><a href="javascript:;">&nbsp;&nbsp;&nbsp;显示外框
+              <input type="checkbox" name="peopleBracket" lay-filter="peopleBracket" lay-skin="switch" lay-text="显示|隐藏" checked>
+            </a></dd>
+            <dd><a href="javascript:;">&nbsp;&nbsp;&nbsp;显示点位
+              <input type="checkbox" name="peoplePoint" lay-filter="peoplePoint" lay-skin="switch" lay-text="显示|隐藏">
+            </a></dd>
+            <dd><a href="javascript:;">&nbsp;&nbsp;&nbsp;旋转地球
+              <input type="checkbox" name="earthRotate" lay-filter="earthRotate" lay-skin="switch" lay-text="转吧|停了" checked>
+            </a></dd>
+            <dd><a href="javascript:;">&nbsp;&nbsp;&nbsp;除你云彩
+              <input type="checkbox" name="cloudRemove" lay-filter="cloudRemove" lay-skin="switch" lay-text="加上|除去" checked>
+            </a></dd>
+          </form>
+        </div>
+      </dl>
+    </li>
+
+    <li class="layui-nav-item">
+      <a href="javascript:;">&nbsp;&nbsp;&nbsp;年代&nbsp;
+        <i class="layui-icon layui-icon-date" style="font-size: 20px;"></i>
+      </a>
+      <dl class="layui-nav-child">
+        <div class="layui-anim layui-anim-scale">
+          <form id="age_form" class="layui-form">
+            <dd><a href="javascript:;" id="age_0">&nbsp;&nbsp;
+              <input type="checkbox" name="age" lay-filter="age_0" title="全部" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="age_1">&nbsp;&nbsp;
+              <input type="checkbox" name="age" lay-filter="age_1" title="古典时期" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="age_2">&nbsp;&nbsp;
+              <input type="checkbox" name="age" lay-filter="age_2" title="中世纪" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="age_3">&nbsp;&nbsp;
+              <input type="checkbox" name="age" lay-filter="age_3" title="文艺复兴时期" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="age_4">&nbsp;&nbsp;
+              <input type="checkbox" name="age" lay-filter="age_4" title="工业时代" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="age_5">&nbsp;&nbsp;
+              <input type="checkbox" name="age" lay-filter="age_5" title="现代" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="age_6">&nbsp;&nbsp;
+              <input type="checkbox" name="age" lay-filter="age_6" title="原子能时代" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="age_7">&nbsp;&nbsp;
+              <input type="checkbox" name="age" lay-filter="age_7" title="信息时代" checked>
+            </a></dd>
+          </form>
+        </div>
+      </dl>
+    </li>
+
+    <li class="layui-nav-item">
+      <a href="javascript:;">&nbsp;&nbsp;&nbsp;类型&nbsp;
+        <i class="layui-icon layui-icon-user" style="font-size: 20px;"></i>
+      </a>
+      <dl class="layui-nav-child">
+        <div class="layui-anim layui-anim-scale">
+          <form class="layui-form">
+            <dd><a href="javascript:;" id="type_0">&nbsp;&nbsp;
+              <input type="checkbox" name="type" lay-filter="type_0" title="全部" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="type_1">&nbsp;&nbsp;
+              <input type="checkbox" name="type" lay-filter="type_1" title="文学家" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="type_2">&nbsp;&nbsp;
+              <input type="checkbox" name="type" lay-filter="type_2" title="军事家" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="type_3">&nbsp;&nbsp;
+              <input type="checkbox" name="type" lay-filter="type_3" title="工程师" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="type_4">&nbsp;&nbsp;
+              <input type="checkbox" name="type" lay-filter="type_4" title="商业家" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="type_5">&nbsp;&nbsp;
+              <input type="checkbox" name="type" lay-filter="type_5" title="科学家" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="type_6">&nbsp;&nbsp;
+              <input type="checkbox" name="type" lay-filter="type_6" title="宗教学" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="type_7">&nbsp;&nbsp;
+              <input type="checkbox" name="type" lay-filter="type_7" title="艺术家" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="type_8">&nbsp;&nbsp;
+              <input type="checkbox" name="type" lay-filter="type_8" title="音乐家" checked>
+            </a></dd>
+          </form>
+        </div>
+      </dl>
+    </li>
+
+    <li class="layui-nav-item">
+      <a href="javascript:;">&nbsp;&nbsp;&nbsp;国家&nbsp;
+        <i class="layui-icon layui-icon-website" style="font-size: 20px;"></i>
+      </a>
+      <dl class="layui-nav-child">
+        <div class="layui-anim layui-anim-scale">
+          <form class="layui-form">
+            <dd><a href="javascript:;" id="country_0">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_0" title="全部" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_1">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_1" title="中国" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_2">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_2" title="美国" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_3">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_3" title="英国" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_4">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_4" title="日本" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_5">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_5" title="德国" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_6">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_6" title="前苏联" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_7">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_7" title="法国" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_8">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_8" title="朝鲜" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_9">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_9" title="西班牙" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_10">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_10" title="阿富汗" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_11">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_11" title="印度尼西亚" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_12">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_12" title="蒙古" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_13">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_13" title="印度" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_14">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_14" title="斯里兰卡" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_15">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_15" title="委内瑞拉" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_16">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_16" title="安哥拉" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_17">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_17" title="瑞典" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_18">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_18" title="几内亚" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_19">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_19" title="澳大利亚" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_20">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_20" title="奥地利" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_21">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_21" title="俄国" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_22">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_22" title="捷克" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_23">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_23" title="匈牙利" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_24">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_24" title="埃及" checked>
+            </a></dd>
+            <dd><a href="javascript:;" id="country_25">&nbsp;&nbsp;
+              <input type="checkbox" name="country" lay-filter="country_25" title="巴基斯坦" checked>
+            </a></dd>
+          </form>
+        </div>
+      </dl>
+    </li>
+  </ul>
+
+<script src="./celebrity.js"></script>
+</body>
+</html>

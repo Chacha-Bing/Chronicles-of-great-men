@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../../lib/layui-v2.5.5/layui/css/layui.css">
+    <style>
+        html,body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .timeline {
+            background-color: black;
+            float: left;
+            width: 20%;
+            height: 100%;
+            overflow: auto;
+        }
+        .container {
+            float: right;
+            width: 80%;
+            height: 100%;
+        }
+        .timeline::-webkit-scrollbar { display: none; }
+        .layui-text h3 {
+            font-size: 22px;
+            color: bisque;
+            font-family: cursive;
+        }
+        .layui-timeline-axis {
+            background-color: bisque;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div id="timeline" class="timeline">
+        
+    </div>
+    <div id="container" class="container"></div>
+
+    <script src="../../lib/jquery-1.12.4-min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+    <script src="https://api.map.baidu.com/api?v=2.0&ak=WAtUWKCu6wHizgwpSW3XZXAgHUcrOO4w"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+
+    <script>
+        var place = [];
+        var route_num;
+        var route = [];
+
+        var dom = document.getElementById("container");
+        var myChart = echarts.init(dom);
+        var app = {};
+        option = null;
+        $.getJSON('./json/Leif_Erikson.json', function (data) {
+            place = data.airports;
+            var routeData = data.routes;
+            var route_len = routeData.length;
+            route_num = routeData[route_len - 1][0];
+            for(let i = 0; i < route_num+1; i++){
+                route[i] = 0;
+            }
+            for(let i = 0; i < route_len; i++){
+                route[ routeData[i][0] ]++;
+            }
+            var k = 0;
+            for(let i = 0; i < route_num+1; i++){
+                var item = '<ul id="timelinelist" class="layui-timeline" style="padding: 50px 60px;">';
+                for(let j=0; j<route[i]; j++){
+                        item += '<li class="layui-timeline-item">';
+                        item +='<i class="layui-icon layui-timeline-axis">&#xe63f;</i>' ;
+                        item +='<div class="layui-timeline-content layui-text">';
+                        item +='<h3 class="layui-timeline-title">'+place[k + j][0]+'</h3>';
+                        item +='</div>';
+                        item +='</li>';
+                }
+                item += '</ul>';
+                k += route[i];
+                $('#timeline').append(item);
+            }
+            
+            var airports = data.airports.map(function (item) {
+                return {
+                    coord: [item[3], item[4]],
+                    name: [item[1]]
+                }
+            });
+            function getAirportCoord(idx) {
+                return [data.airports[idx][3], data.airports[idx][4]];
+            }
+            function getAirportName(idx){
+                return [data.airports[idx][1]];
+            }
+            // Route: [airlineIndex, sourceAirportIndex, destinationAirportIndex]
+            var routesGroupByAirline = {};
+            data.routes.forEach(function (route) {
+                var airline = data.airlines[route[0]];
+                var airlineName = airline[0];
+                if (!routesGroupByAirline[airlineName]) {
+                    routesGroupByAirline[airlineName] = [];
+                }
+                routesGroupByAirline[airlineName].push(route);
+            });
+
+            var pointsData = [];
+            data.routes.forEach(function (airline) {
+                pointsData.push(getAirportCoord(airline[1]));
+                pointsData.push(getAirportCoord(airline[2]));
+            });
+            var pointsName = [];
+            data.routes.forEach(function (airline){
+                pointsName.push(getAirportName(airline[1]));
+                pointsName.push(getAirportName(airline[2]));
+            });
+            var routes;
+            var dotIndex1=0;
+            var dotnum=0;
+            var dotIndex2=0;
+            var series = data.airlines.map(function (airline) {
+                var airlineName = airline[0];
+
+                routes = routesGroupByAirline[airlineName];
+
+                if (!routes) {
+                    return null;
+                }
+                return {
+                    type: 'lines3D',
+                    name: airlineName,
+
+                    effect: {
+                        show: true,
+                        trailWidth: 2,
+                        trailLength: 0.25,
+                        trailOpacity: 1,
+                        trailColor: 'rgb(225, 10, 10)'
+                    },
+
+                    lineStyle: {
+                        width: 1.5,
+                        color: 'rgb(250, 250, 0)',
+                        // color: 'rgb(118, 233, 241)',
+                        opacity: 0.25
+                    },
+                    blendMode: 'lighter',
+                    
+                    data: routes.map(function (item) {
+                        return [airports[item[1]].coord, airports[item[2]].coord];
+                    })
+                };
+            }).filter(function (series) {
+                return !!series;
+            });
+            series.push({
+                type: 'scatter3D',
+                coordinateSystem: 'globe',
+                blendMode: 'lighter',
+                symbolSize: 2,
+                itemStyle: {
+                    color: 'rgb(50, 50, 150)',
+                    opacity: 0.2
+                },      
+                data: pointsData,
+                name: pointsName
+            });
+            var option = {
+                legend: {
+                    selectedMode: 'single',
+                    left: 'left',
+                    data: Object.keys(routesGroupByAirline),
+                    orient: 'vertical',
+                    textStyle: {
+                        color: '#fff'
+                    }
+                },
+                tooltip:{
+                    triggerOn:"mousemove", 
+                    alwaysShowContent:true,
+                    formatter: function (item) {
+                        var result='';
+                        var owari = false;
+                        if(item.dataIndex==0){
+                            for(var j=0;item.seriesName[j]!=',';j++){
+                                result += item.seriesName[j];
+                            }
+                        }
+                        else{
+                            for(var i=0;i<item.seriesName.length;i++){
+                                if(item.seriesName[i]==','){
+                                    dotIndex1 = i; 
+                                    dotnum= dotnum+1;
+                                    if(dotnum==item.dataIndex){
+                                        for(var j=dotIndex1+1;item.seriesName[j]!=','&&j<item.seriesName.length;j++){
+                                            result += item.seriesName[j];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    dotnum=0;
+                    return result;                    
+                    }
+                },
+                globe: {
+
+                    baseTexture: './img/earth.jpg',
+                    heightTexture: './img/bathymetry_bw_composite_4k.jpg',
+
+                    displacementScale: 0.1,
+
+                    shading: 'realistic',
+                    realisticMaterial: {
+                        roughness: 0.2,
+                        metalness: 0
+                    },
+
+                    environment: './img/starfield.jpg',
+
+                    viewControl: {
+                        autoRotate: false
+                    },
+                    silent: true
+                },
+                series: series
+            };
+            myChart.setOption(option);
+            tools.loopShowTooltip(myChart, option, {loopSeries: true});
+            window.addEventListener('keydown', function () {
+                series.forEach(function (series, idx) {
+                    myChart.dispatchAction({
+                        type: 'lines3DToggleEffect',
+                        seriesIndex: idx
+                    });
+                })
+            });
+        });
+    </script>
+</body>
+</html>

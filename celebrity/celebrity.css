@@ -1,0 +1,166 @@
+@font-face {
+    font-family: 'chinaStyle';
+    src: url("../src/腾祥铁山楷书简.ttf")
+}
+html,body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    overflow: hidden;
+    }
+.layui-form-switch {
+    position: relative;
+    bottom: 5px;
+    left: 10px;
+}
+.layui-form-onswitch {
+    border-color: rgb(24, 138, 138);
+    background-color:rgb(24, 138, 138);
+}
+.layui-nav {
+    background-color: #142b42;
+}
+.layui-nav .layui-form-checkbox{
+    font-size: 0px !important;
+    border-radius: 30px;
+    border: none;
+}
+.layui-form-checkbox i {
+    border: none;
+}
+.layui-nav .layui-nav-item a {
+    color: rgb(255, 241, 226);
+}
+li a {
+    padding: 4px !important;
+    border-radius: 30px;
+    border: none;
+}
+.layui-form-checked span {
+    background-color: #009688;
+}
+.layui-form-checkbox span {
+    color: #613858;
+}
+.cesiumContainer {
+    position: absolute;
+    left: 310px;
+    right: 0;
+}
+/* 右弹窗样式 */
+.infobox {
+        position: absolute;
+        right: 0;
+    top:6%;
+    bottom: 0;
+        width: 250px;
+        background-color: rgba(49, 49, 61, 0.8);
+        animation: bounceToLeft 2s;
+    }
+.no-see {
+        display: none;
+    }
+    .close-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+    height: 15px;
+    width: 250px;
+    }
+.layui-table {
+    margin: 0;
+    background-color: transparent;
+    color: bisque;
+}
+.layui-table td,.layui-table th {
+    border-style: dashed;
+    border-color: #ffe4c4;
+    padding: 9px 10px;
+}
+.layui-table tbody tr:hover {
+    background-color: #1b2235;
+}
+    .name {
+        text-align: center;
+        color: beige;
+        font-size: 30px;
+    padding: 16px 0 5px 0;
+    font-family: cursive;
+    }
+    .portrait {
+        width: 100%;
+        height: 250px;
+    }
+#masterBody td {
+    padding: 5px 9px;
+}
+#moreInfo {
+    color: azure;
+}
+#moreInfo:hover {
+    cursor: pointer;
+    color: burlywood;
+}
+    @keyframes bounceToLeft {
+    0% {opacity: 0;transform: translateX(-50px);}
+    100% {opacity: 1;transform: none;}
+}
+.left-cloud-out {
+    position: absolute;
+    top: -200px;
+    left: -400px;
+    height: 200%;
+    width: 200%;
+    z-index: 9;
+    pointer-events: none;
+    animation: left-cloud-fadeout forwards 3s ease-in;
+    /* animation-delay: 3s */
+}
+.right-cloud-out {
+    position: absolute;
+    top: -300px;
+    right: -700px;
+    height: 200%;
+    width: 200%;
+    z-index: 9;
+    pointer-events: none;
+    animation: right-cloud-fadeout forwards 3s ease-in;
+    /* animation-delay: 3s */
+}
+.left-cloud-in {
+    position: absolute;
+    top: -200px;
+    left: -400px;
+    height: 200%;
+    width: 200%;
+    z-index: 9;
+    pointer-events: none;
+    animation: left-cloud-fadein forwards 3s ease-in;
+}
+.right-cloud-in {
+    position: absolute;
+    top: -300px;
+    right: -700px;
+    height: 200%;
+    width: 200%;
+    z-index: 9;
+    pointer-events: none;
+    animation: right-cloud-fadein forwards 3s ease-in;
+}
+@keyframes left-cloud-fadein {
+    0% {opacity: 0.7;}
+    100% {opacity: 1;transform: translateX(2000px);}
+}
+@keyframes right-cloud-fadein {
+    0% {opacity: 0.7;}
+    100% {opacity: 1;transform: translateX(-2000px);}
+}
+@keyframes left-cloud-fadeout {
+    0% {opacity: 0.8;}
+    100% {opacity: 0.6;transform: translateX(-2000px);}
+}
+@keyframes right-cloud-fadeout {
+    0% {opacity: 0.8;}
+    100% {opacity: 0.6;transform: translateX(2000px);}
+}
+#leftbar::-webkit-scrollbar { display: none; }

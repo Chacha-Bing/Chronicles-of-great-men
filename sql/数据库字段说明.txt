@@ -1,0 +1,45 @@
+//伟人数据库
+CREATE TABLE mytest.greatman
+(
+    ID int  NOT NULL AUTO_INCREMENT primary key,	//自增ID号，也是主键
+    name varchar(50),		//伟人名字【如实写入】
+    gender varchar(10),		//伟人性别【暂时只支持 男/女】
+    bth_year INT,			//出生年【必须是明确的数字，不能有问号等非数字】
+    dth_year INT,			//卒故年【必须是明确的数字，不能有问号等非数字】
+    nation varchar(30),		//国籍【根据网页】
+    lon FLOAT,				//出生地经度【float类型】
+    lat FLOAT,				//出生地维度【float类型】
+    act_age varchar(20),	//所处时代【根据网页】
+    occu varchar(20),		//职业【可供选择项目：前者为可选项，{}中为肖像文件夹对应的名字
+    	1.军事家（包含了大将军和海军统帅） {Militarist}
+		2.工程师{Engineer}
+		3.商业家{Trader}
+		4.神学家{Religious}
+		5.科学家{Scientist}
+		6.文学家{Writer}
+		7.艺术家{Artist}
+		8.音乐家{Musician}
+    】
+    det_info TEXT,			//详细信息【纯文本】
+    ach TEXT,				//成就【纯文本】
+    pict varchar(80)		//人物肖像相对路径【"../src/peo_pict/+后续对应位置"】
+);
+//案例如下:
+INSERT INTO mytest.greatman VALUES (null, '紫式部', '女', '973', '1014', '日本', 114, 35, '中世纪', '文学家', '紫式部（973？－1014或1031年？），日本平安时代女性文学家。出身贵族文人世家，父兄皆善汉诗、和歌。本姓藤原，实际的本名不详，据猜测可能为藤原香子或藤原则子。中古三十六歌仙、女房三十六歌仙之一。其和歌曾收录于《小仓百人一首》。幼时从父藤原为时学习汉学，通晓音律和佛典。1004年4月，紫式部丧夫寡居，应召入宫侍奉一条天皇的中宫藤原彰子，同年秋开始创作《源氏物语》。', '紫式部的主要作品是长篇小说《源氏物语（日语：源氏物語／げんじものがたり；罗马音：GenjiMonogatari）》；作品描写人物心理细腻，文字典雅，情节曲折，被认为是世界最早的长篇小说，对往后日本文学之影响极大。', '../src/peo_pict/Writer/Murasaki_Shikibu.png');
+
+-------------------------------------------------------------------------------------------------------------------------
+//伟人作品数据库
+CREATE TABLE mytest.masterwork
+(
+    ID int  NOT NULL AUTO_INCREMENT primary key,	//自增ID号，也是主键
+    name varchar(50),		//伟人名字（用于同第一个数据库连接）
+    w_name varchar(50),		//作品名字【纯文本】
+    w_type varchar(15),		//作品类型【类型随意写，比如文学作品，音乐作品等】
+    w_time varchar(15),		//作品出版或发行日期
+    w_pict varchar(40),		//作品图片相对路径【"..src/work_pict/+自己的作品文件名"】
+    w_info TEXT 			//作品详细信息【纯文本】
+);
+//案例如下:
+INSERT INTO mytest.masterwork VALUES (null, '紫式部', '《源氏物语》', '文学作品', '1004-09', '../src/work_pict/wallpaper.jpg','是一部......');
+
+//PS:附上本程序资料来源网址--https://civ6.huijiwiki.com/wiki/伟人#.E5.A4.A7.E5.B7.A5.E7.A8.8B.E5.B8.88
