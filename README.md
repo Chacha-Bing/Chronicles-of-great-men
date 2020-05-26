@@ -1,5 +1,10 @@
 # 伟人编年史
- &emsp;&emsp;以可视化展示历史伟人时空信息分布为目标，利用 **Cesium** 组件搭建 **webGIS** 平台，后端使用 PHP 及 MySQL，并结合 Echarts 展示历史伟人的三维空间分布及行踪与数据分析。 
+
+访问网址为 ：[http://bingchacha.top/greatman/celebrity/](http://bingchacha.top/greatman/celebrity/)
+
+（系早期项目，未做加载优化等）
+
+ 以可视化展示历史伟人时空信息分布为目标，利用 **Cesium** 组件搭建 **webGIS** 平台，后端使用 PHP 及 MySQL，并结合 Echarts 展示历史伟人的三维空间分布及行踪与数据分析。 
 ![界面一览图](./img/11.png)
 # 展示方式
 + 人物显示方式默认按照框图标识和人名显示，也可以通过左侧开关将显示方式变为以点位的方式显示。
